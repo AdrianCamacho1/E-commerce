@@ -42,7 +42,11 @@ router.post('/', (req, res) => {
   Tag.create(req.body)
   .then((tag)=> {
     res.status(200).json(err);
-  });
+  })
+  .catch((err => {
+    console.log(err);
+    res.status(400).json(err);
+  }));
 });
 
 router.put('/:id', (req, res) => {

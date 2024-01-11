@@ -8,18 +8,22 @@ router.get('/', (req, res) => {
   // find all products
   // be sure to include its associated Category and Tag data
   Product.findAll({
-    include: [{
+    include: [
+      {
       model: Category
     },
   {
-    model:Tag
-  }]
+    model:Tag,
+    attributes: ['tag_name'],
+    through: ProductTag
+  }
+]
   })
   .then((productData) => res.json(productData))
   .catch(err => {
     console.log(err);
     res.status(500).json(err);
-  })
+  });
 });
 
 // get one product
@@ -35,7 +39,9 @@ router.get('/:id', (req, res) => {
         model: Category
       },
       {
-        model: Tag
+        model: Tag,
+        attributes: ['tag_name'],
+        through: ProductTag
       }
     ]
   })
@@ -95,9 +101,9 @@ router.put('/:id', (req, res) => {
     .then((product) => {
       if (req.body.tagIds && req.body.tagIds.length) {
         
-        ProductTag.findAll({
-          where: { product_id: req.params.id }
-        }).then((productTags) => {
+        return ProductTag.findAll({ where: { product_id: req.params.id }
+        })
+        .then((productTags) => {
           // create filtered list of new tag_ids
           const productTagIds = productTags.map(({ tag_id }) => tag_id);
           const newProductTags = req.body.tagIds

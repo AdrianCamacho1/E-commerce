@@ -7,9 +7,11 @@ router.get('/', (req, res) => {
   // find all categories
   // be sure to include its associated Products
   Category.findAll({
-    include: [{
+    include: [
+      {
       model: Product
-    }]
+    }
+  ]
   })
   .then((categoryData) => res.json(categoryData))
   .catch(err => {
@@ -25,13 +27,15 @@ router.get('/:id', (req, res) => {
     where: {
       id: req.params.id
     },
-    include: [{
+    include: [
+      {
       model: Product
-    }]
+    }
+  ]
   })
   .then(categoryData => {
     if (!categoryData) {
-      res.status(400).json({message: 'Theres no id for this product'});
+      res.status(404).json({message: 'Theres no id for this product'});
       return;
     }
     res.json(categoryData);
@@ -44,26 +48,31 @@ router.get('/:id', (req, res) => {
 
 router.post('/', (req, res) => {
   // create a new category
-  Category.create(req.body)
-  .then((category) => {
-    res.status(200).json(category);
+  Category.create({
+    category_name: req.body.category_name
   })
-  .catch((err) => {
+  .then(categoryData => res.json(categoryData))
+  .catch(err => {
     console.log(err);
-    res.status(400).json(err);
+    res.status(500).json(err);
   });
 });
 
 router.put('/:id', (req, res) => {
   // update a category by its `id` value
-  Product.update(req.body, {
-    where: {
-      id: req.params.id,
+  Product.update (
+    {
+      category_name: req.body.category_name
     },
-  })
+    {
+      where: {
+        id: req.params.id
+      }
+    }
+  )
   .then(categoryData => {
-    if(!categoryData) {
-      res.status(404).json({message : 'Theres no id for this product'});
+    if (!categoryData) {
+      res.status(404).json ({ message: 'Theres no Category found'});
       return;
     }
     res.json(categoryData);
